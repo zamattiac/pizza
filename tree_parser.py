@@ -1,25 +1,4 @@
-import sys
-filename = sys.argv[1]
-# Output file
-o = 'o' in sys.argv or '-o' in sys.argv
-
-current = None
-
-class MemoryArray(object):
-    def __init__(self):
-        self.array = []
-        self.index = 0
-
-    def increment(self):
-        self.index += 1
-
-    def reset(self):
-        self.index = 0
-
-    def deliver(self):
-        return self.array[self.index]
-
-arrays = {'cheese': MemoryArray()}
+from memory import *
 
 
 class Parser(object):
@@ -30,6 +9,8 @@ class Parser(object):
     def parse_outer_scope(self):
         in_block = False
         for line in self.body.split('\n'):
+            if line == '':
+                continue
             if line.startswith('|>') or line.startswith('#'):
                 continue
             if '?' in line:
@@ -49,13 +30,15 @@ class Parser(object):
 
 
 class MainFileParser(Parser):
-    def __init__(self):
+    def __init__(self, filename):
         super(MainFileParser, self).__init__()
         with open(filename) as f:
             self.body = f.read().split('comeinwereopen')[1].split('sorrywereclosed')[0]
-            self.body = self.body.replace('\n\n', '')
-            f.close()
+            self.body = self.body.replace('\n\n', '\n')
         self.parse_outer_scope()
+
+    def __repr__(self):
+        return "\n".join([str(command) for command in self.commands])
 
     def run(self):
         for command in self.commands:
@@ -72,29 +55,46 @@ class KneadFileParser(Parser):
 class LineParser:
     def __init__(self, statement):
         self.statement = statement.split(' ')
+        self.statement = [self.parse_delivery(x) for x in self.statement]
         self.keyword = self.statement[0]
+
+    def __repr__(self):
+        return self.keyword + ":" + ", ".join(self.statement[1:])
+
+    def parse_delivery(self, word):
+        if 'delivery' in word:
+            if not word.replace('-delivery', ''):
+                return arrays.get(word.replace('-delivery', '')).deliver()
+            return arrays.get('cheese').deliver()
+        return word
+
+    def deliver(self):
+        return
+
+    def handle_toppings(self):
+        for topping in self.statement:
+            arrays[topping] = MemoryArray()
+
+    def ooze(self):
+        print(" ".join(self.statement[1:]))
+
+    def run(self):
         if len(self.statement) == 1:
             quick_keys = {
                 'extra': arrays.get('cheese').increment(),
                 'holdthe': arrays.get('cheese').reset(),
             }
             quick_keys.get(self.keyword)
-        keywords = {
+            return
+        self.keywords = {
             'toppings': self.handle_toppings(),
-            'deliver': self.deliver(),
+            'delivery': self.deliver(),
             'ooze': self.ooze(),
+            'extra': arrays.get(self.statement[1]).increment(),
+            'holdthe': arrays.get(self.statement[1]).reset()
         }
-        if self.keyword in keywords:
-            keywords.get(self.keyword)
-
-    def deliver(self):
-        return
-    def handle_toppings(self):
-        return
-
-
-    def run(self):
-        print(self.statement)
+        if self.keyword in self.keywords:
+            self.keywords.get(self.keyword)
 
 
 class ConditionNode:
@@ -102,14 +102,10 @@ class ConditionNode:
         # self.type
     #     self.evaluate()
         self.commands = []
+
     def evaluate(self):
         pass
 
     def run(self):
         for command in self.commands:
             command.run()
-
-
-if __name__ == '__main__':
-    m = MainFileParser()
-    m.run()
