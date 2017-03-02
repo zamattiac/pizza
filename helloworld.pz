@@ -4,21 +4,28 @@ comeinwereopen
 |> toppings cheese tomato;
 
 |> lemmegetdeepdish hello;
-|> extra cheese;
-|> holdthe cheese;
+|> extra cheese
+|> holdthe cheese
 
 |>ooze digiornos hello world;
-|>yougotta delivery?
-|>    !ooze delivery;!ooze second;
-|>    !ooze digiornos 'hello'; ooze poop;
+yougotta delivery?
+    !ooze delivery;!ooze second;
+    !ooze digiornos 'hello'; ooze poop;
 |>ooze hello world; ooze goodbye world;
 
-toppings tomato;
-ooze hello delivery;
-ooze tomato-delivery;
+toppings sauce onion;
+
+|>extra sauce
+|>extra cheese;
+lemmegeta deepdish world;
+lemmegeta sauce-deepdish ilikepizza;
+ooze digiornos hello delivery;
+ooze sauce-delivery;
+holdthe sauce;
+ooze sauce-delivery;
+knead helloworld;
 
 
 sorrywereclosed
 
-ooze delivery;
-ooze digiornos hello world;
+ooze outside main;
