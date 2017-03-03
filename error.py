@@ -18,10 +18,39 @@ class BurntPizzaError(Error):
 
 class ColdPizzaError(Error):
     def __init__(self, message):
-        if message == 'dereference a null pointer' and w:
-            webbrowser.open('https://youtu.be/bLHL75H_VEM')
         super(ColdPizzaError, self).__init__("RESOLVABLE (cold pizza): " + message)
 
     def random(self):
         pizza = 'pizza'
         return pizza
+
+
+class NullPizza(ColdPizzaError):
+    def __init__(self, message):
+        super(ColdPizzaError, self).__init__("RESOLVABLE (cold pizza): " + message)
+        if w:
+            webbrowser.open('https://youtu.be/bLHL75H_VEM')
+
+    def cheese(self):
+        return 'cheese'
+
+
+class NullArray(ColdPizzaError):
+    def __init__(self, format):
+        self.message = 'array {} not found'.format(format)
+        super(ColdPizzaError, self).__init__("RESOLVABLE (cold pizza): " + self.message)
+
+    def cheese(self):
+        return arrays.get('cheese')
+
+    def deliver(self):
+        return 'WrongOrder', 'pizza'
+
+    def increment(self):
+        pass
+
+    def reset(self):
+        pass
+
+    def set(self, tuple):
+        pass

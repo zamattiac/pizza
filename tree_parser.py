@@ -25,9 +25,9 @@ class Parser(object):
                 continue
             line = line.rstrip(';').split(';')
             for spot in line:
-                spot = spot.strip().strip('!')
+                spot = spot.strip()
                 if in_block and spot.startswith('!'):
-                    block.commands.append(LineParser(spot))
+                    block.commands.append(LineParser(spot.strip('!')))
                     continue
                 else:
                     in_block = False
@@ -43,6 +43,10 @@ class MainFileParser(Parser):
         super(MainFileParser, self).__init__()
         with open(filename) as f:
             self.body = f.read().split('comeinwereopen')[1].split('sorrywereclosed')[0]
+            if not self.body:
+                k = KneadFileParser(filename)
+                k.run()
+                return
             self.body = self.body.replace('\n\n', '\n').replace('digiornos ', '')
             self.verify_kosher()
         self.parse_outer_scope()
@@ -80,7 +84,8 @@ class LineParser:
     def parse_delivery(self, word):
         if 'delivery' in word:
             if word.replace('delivery', ''):
-                return arrays.get(word.replace('-delivery', '')).deliver()[1]
+                return arrays.get(word.replace('-delivery', ''),
+                                  NullArray(word.replace('-delivery', ''))).deliver()[1]
             return arrays.get('cheese').deliver()[1]
         return word
 
@@ -95,10 +100,10 @@ class LineParser:
         print(" ".join([str(x) for x in self.statement[1:]]))
 
     def array_increment(self):
-        arrays.get(self.statement[1]).increment()
+        arrays.get(self.statement[1], NullArray(self.statement[1])).increment()
 
     def array_reset(self):
-        arrays.get(self.statement[1]).reset()
+        arrays.get(self.statement[1], NullArray(self.statement[1])).reset()
 
     def set_var(self):
         memory_array = 'cheese'
@@ -108,7 +113,7 @@ class LineParser:
             var_type = var_type[1]
         else:
             var_type = var_type[0]
-        arrays.get(memory_array).set(var_type, " ".join(self.statement[2:]))
+        arrays.get(memory_array, NullArray(memory_array)).set(var_type, " ".join(self.statement[2:]))
 
     def knead(self):
         self.kneaded.run()
@@ -137,24 +142,31 @@ class LineParser:
 
 class ConditionNode:
     def __init__(self, statement):
-        self.statement = [self.parse_delivery(x) for x in statement.lstrip('yougotta').rstrip('?').split(' ')]
-        self.evaluate()
+        self.statement = [self.parse_delivery(x) for x in statement.lstrip('yougotta ').rstrip('?').split(' ')]
+        self.acceptable = self.evaluate()
         self.commands = []
 
     def __repr__(self):
-        return "?: {}\n\t".format(self.statement) + '\n\t'.join(self.commands)
+        return '?: {}\n\t'.format(' '.join(self.statement)) + '\n\t'.join([str(x) for x in self.commands])
 
     def parse_delivery(self, word):
         if 'delivery' in word:
             if word.replace('delivery', ''):
-                return arrays.get(word.replace('-delivery', '')).deliver()[1]
+                return arrays.get(word.replace('-delivery', ''), NullArray(word.replace('-delivery', ''))).deliver()[1]
             return arrays.get('cheese').deliver()[1]
         return word
 
     def evaluate(self):
-        if not self.statement[0] == 'pizza':
-            self.run()
+        if len(self.statement) == 0 and self.statement[0] == 'pizza':
+            return False
+
+        if self.statement[1] == 'cheaperthan':
+            return self.statement[0] < self.statement[2]
+
+        if self.statement[1] == 'samepriceas':
+            return self.statement[0] == self.statement[2]
 
     def run(self):
-        for command in self.commands:
-            command.run()
+        if self.acceptable:
+            for command in self.commands:
+                command.run()

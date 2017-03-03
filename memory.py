@@ -21,7 +21,7 @@ class MemoryArray(object):
         if self.array[self.index][1]:
             return self.array[self.index]
         else:
-            return 'WrongCustomer', ColdPizzaError('dereference a null pointer').random()
+            return 'WrongOrder', NullPizza('dereference a null pointer').random()
 
     def set(self, type, string):
         self.array[self.index] = (type, string)

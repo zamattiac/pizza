@@ -18,5 +18,6 @@ if __name__ == '__main__':
     else:
         program.run()
         if m:
+            print('\nMemory arrays')
             for array in arrays:
                 print(array + str(arrays[array]))

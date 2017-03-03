@@ -15,7 +15,7 @@
 ## Syntax
 - Main method must be enclosed within `comeinwereopen` and `sorrywereclosed`
 - Anything after main is considered function-like and can be accessed with the `knead` keyword in any file
-    (e.g. knead file2.pz)
+    (e.g. knead file2)
 - Comments: `|>` (shaped like pizza). Inline is not supported. `#` is accepted but not in the spirit of pizza.
 - Dietary custom: the interpreter will reject any program with unsavory (e.g. mushroom) or unkosher (e.g. ham) content
 - See the Parser section for syntax guidelines
@@ -25,7 +25,7 @@
 - The default namespace is `cheese` but other arrays can be declared with the `toppings` keyword.
 - Datatypes are: thincrust (int), thickcrust (float), deepdish (string)
 - Each array has a pointer that can be increased with `extra [namespace]` and reset with `holdthe [namespace]`
-- Initializing/mutating a memory location is done with `lemegeta [namespace]-[datatype] [value]`
+- Initializing/mutating a memory location is done with `lemmegeta [namespace]-[datatype] [value]`
 - Accessing a memory location (delivery) is done with `[namespace]-delivery`
 - Because cheese is default, `[namespace]-` is unnecessary
 - When using values inline, preface with the keyword `digiornos`. Handy rule: if it's not `delivery`, it's `digiornos`.
@@ -39,13 +39,18 @@
 - This program is vegetarian!!
 - Lines that end in ? are loops (for, if). They must be on a newline.
 - `yougotta` is the keyword for an if statement (e.g. `yougotta delivery?` => `if current pointer set`
+- tip: `yougotta pizza?` always evaluates to false. This interpreter doesn't like to share its meal.
+- comparators: 
+    - `samepriceas` (==)
+    - `cheaperthan` (<) 
+    - there is no "more expensive than" because no one wants more expensive pizza
 - Every line in the loop block must begin with `!`. Pizza doesn't care if you indent.
 
 ## Error
 - using the `w` flag is really really recommended.
 - Turn your sound off when errors reporting is on. Error messages can be loud!
 - Many traditional fatal errors are just suggestions for a food as hardy as pizza, and they won't cause crashes.
-- Pizza is a forgiving language: 
+- Pizza is a forgiving language: for example, when you dereference a null pointer it assumes you meant to say 'pizza'
 - Many traditional warnings are taken seriously by a food as diligent as pizza, and they will cause crashes!
 
 Example code:
