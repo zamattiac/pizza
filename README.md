@@ -28,6 +28,7 @@
 - Initializing/mutating a memory location is done with `lemmegeta [namespace]-[datatype] [value]`
 - Accessing a memory location (delivery) is done with `[namespace]-delivery`
 - Because cheese is default, `[namespace]-` is unnecessary
+- In a similar vein: takeorder-[prompt] takes input and directly replaces
 - When using values inline, preface with the keyword `digiornos`. Handy rule: if it's not `delivery`, it's `digiornos`.
 - Dereferencing a null pointer will not cause a fatal error! The interpreter will assume you meant the word pizza. 
     It is handy to have warnings on.
@@ -44,7 +45,8 @@
     - `samepriceas` (==)
     - `cheaperthan` (<) 
     - there is no "more expensive than" because no one wants more expensive pizza
-- Every line in the loop block must begin with `!`. Pizza doesn't care if you indent.
+- `gimme` is the keyword for for loops. it is similar to above. It pythonically iterates.
+- Every line in a loop block must begin with `!`. Pizza doesn't care if you indent.
 
 ## Error
 - using the `w` flag is really really recommended.

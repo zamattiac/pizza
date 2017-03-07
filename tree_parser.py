@@ -1,5 +1,22 @@
+from copy import copy
+
 from memory import *
 from error import *
+
+
+def parse_replacements(word):
+    if type(word) != str: return word
+    if 'takeorder' in word:
+        return input(word.replace('takeorder-', '') + '- ')
+
+    if 'delivery' in word:
+        pair = arrays.get(word.replace('-delivery', ''), arrays.get('cheese')).deliver()
+        if pair[0] == 'thincrust':
+            return int(pair[1])
+        elif pair[0] == 'thickcrust':
+            return float(pair[1])
+        return str(pair[1])
+    return word
 
 
 class Parser(object):
@@ -8,7 +25,7 @@ class Parser(object):
         self.body = None
 
     def verify_kosher(self):
-        treif_words = ['peppero', 'ham', 'mushroom']
+        treif_words = ['peppero', 'ham', 'mushr']
         [BurntPizzaError('this program is not kosher.') for word in treif_words if word in self.body]
 
     def parse_outer_scope(self):
@@ -20,6 +37,11 @@ class Parser(object):
                 continue
             if '?' in line:
                 block = ConditionNode(line)
+                self.commands.append(block)
+                in_block = True
+                continue
+            elif ':' in line:
+                block = LoopNode(line)
                 self.commands.append(block)
                 in_block = True
                 continue
@@ -79,15 +101,7 @@ class LineParser:
     def __repr__(self):
         if self.keyword == 'knead':
             return str(self.kneaded)
-        return self.keyword + ":" + ", ".join(self.statement[1:])
-
-    def parse_delivery(self, word):
-        if 'delivery' in word:
-            if word.replace('delivery', ''):
-                return arrays.get(word.replace('-delivery', ''),
-                                  NullArray(word.replace('-delivery', ''))).deliver()[1]
-            return arrays.get('cheese').deliver()[1]
-        return word
+        return self.keyword + ":" + ", ".join(str(x) for x in self.statement[1:])
 
     def deliver(self):
         pass
@@ -118,8 +132,12 @@ class LineParser:
     def knead(self):
         self.kneaded.run()
 
+    def default(self):
+        ColdPizzaError('Keyword `{}` not found'.format(self.keyword))
+
     def run(self):
-        self.statement = [self.parse_delivery(x) for x in self.statement]
+        self.statement = [parse_replacements(x) for x in self.statement]
+
         if len(self.statement) == 1:
             quick_keys = {
                 'extra': arrays.get('cheese').increment(),
@@ -137,28 +155,20 @@ class LineParser:
             'lemmegeta': self.set_var,
             'knead': self.knead,
         }
-        keywords.get(self.keyword)()
+        keywords.get(self.keyword, self.default)()
 
 
 class ConditionNode:
     def __init__(self, statement):
-        self.statement = [self.parse_delivery(x) for x in statement.lstrip('yougotta ').rstrip('?').split(' ')]
-        self.acceptable = self.evaluate()
+        self.statement = statement.lstrip('yougotta ').rstrip('?').split(' ')
         self.commands = []
 
     def __repr__(self):
         return '?: {}\n\t'.format(' '.join(self.statement)) + '\n\t'.join([str(x) for x in self.commands])
 
-    def parse_delivery(self, word):
-        if 'delivery' in word:
-            if word.replace('delivery', ''):
-                return arrays.get(word.replace('-delivery', ''), NullArray(word.replace('-delivery', ''))).deliver()[1]
-            return arrays.get('cheese').deliver()[1]
-        return word
-
     def evaluate(self):
-        if len(self.statement) == 0 and self.statement[0] == 'pizza':
-            return False
+        if len(self.statement) == 1:
+            return self.statement[0] != 'pizza'
 
         if self.statement[1] == 'cheaperthan':
             return self.statement[0] < self.statement[2]
@@ -167,6 +177,41 @@ class ConditionNode:
             return self.statement[0] == self.statement[2]
 
     def run(self):
+        self.statement = [parse_replacements(x) for x in self.statement]
+        self.acceptable = self.evaluate()
         if self.acceptable:
             for command in self.commands:
                 command.run()
+
+
+class LoopNode:
+    def __init__(self, statement):
+        self.statement = statement.lstrip('gimme ').rstrip(':')
+        self.commands = []
+
+    def __repr__(self):
+        return 'loop: {}\n\t'.format(self.statement) + '\n\t'.join([str(x) for x in self.commands])
+
+    def iterable(self):
+        self.statement = parse_replacements(self.statement)
+        if type(self.statement) != tuple:
+            return arrays.get(self.statement, self.statement)
+        if type(self.statement) == int:
+            return range(self.statement)
+        elif type(self.statement) == str:
+            return str(self.statement[0][1])
+        else:
+            ColdPizzaError('`{}` non-iterable'.format(self.statement))
+            return 'PIZZA'
+
+    def run(self):
+        iterable = self.iterable()
+        length = len(iterable)
+        commands = [[copy(command) for x in range(length)] for command in self.commands]
+        n = 0
+        for i in iterable:
+            if n < length:
+                for command in commands:
+                    # runs out of index
+                    command[n].run()
+                    n += 1

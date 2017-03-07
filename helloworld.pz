@@ -9,7 +9,7 @@ comeinwereopen
 |>delivery;
 |>ooze digiornos hello world;
 yougotta delivery?
-    !ooze delivery;!ooze second;
+    !ooze in:loop delivery;!ooze in:loop second;
     !ooze digiornos 'hello'; ooze poop;
 |>ooze hello world; ooze goodbye world;
 

@@ -9,6 +9,13 @@ class MemoryArray(object):
     def __repr__(self):
         return "Index {}".format(self.index) + str(self.array)
 
+    def __iter__(self):
+        for i in self.array:
+            yield i
+
+    def __len__(self):
+        return len(self.array)
+
     def increment(self):
         self.index += 1
         if self.index == len(self.array):
